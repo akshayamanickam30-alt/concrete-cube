@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>150 mm Concrete Test Cube — 3D Cutaway</title>
+<style>
+  :root{--blue:#2f80ff;--pale:#dff1ff;--ink:#15171a;--muted:#74777b;--panel:#f2f0f0;--line:#e2e2e2}
+  *{box-sizing:border-box}
+  body{margin:0;background:#faf9f9;color:var(--ink);font-family:Inter,Arial,sans-serif}
+  main{max-width:900px;margin:0 auto;padding:24px 18px 42px}
+  h1{font-size:clamp(28px,5vw,42px);font-weight:500;line-height:1.16;margin:8px 0 10px}
+  .subtitle{color:var(--muted);font-size:18px;margin:0 0 24px}
+  .viewer{height:min(66vh,560px);min-height:360px;background:var(--panel);border:1px solid var(--line);border-radius:24px;overflow:hidden;position:relative}
+  #scene{width:100%;height:100%;display:block;touch-action:pan-y}
+  .controls{position:absolute;top:14px;right:14px;display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;z-index:2}
+  button{border:1px solid #dedede;background:white;color:#111;border-radius:30px;padding:12px 17px;font-size:15px;font-weight:600;cursor:pointer}
+  button.active{background:var(--pale);border-color:var(--pale)}
+  button:focus-visible,input:focus-visible{outline:3px solid #80baff;outline-offset:2px}
+  .status{position:absolute;bottom:14px;left:14px;background:#fff;border:1px solid #e4e4e4;border-radius:30px;padding:9px 14px;font-style:italic;max-width:calc(100% - 28px);font-size:14px}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#00885a;margin-right:8px}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;margin:22px 0}
+  .filter{background:#f0eeee;border:1px solid transparent;padding:12px 16px}
+  .filter.active{background:var(--pale);color:var(--blue)}
+  .swatch{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:9px;vertical-align:middle}
+  .card{background:white;border:1px solid var(--line);border-radius:22px;padding:22px;margin-top:18px}
+  .cardhead{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;flex-wrap:wrap}
+  h2{font-size:clamp(23px,4vw,32px);font-weight:500;margin:0 0 12px}
+  .volume{font-family:ui-monospace,monospace;background:#f0eeee;border-radius:28px;padding:9px 14px;font-size:16px}
+  .desc{color:var(--muted);font-size:17px;line-height:1.55;margin:8px 0 18px}
+  .stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .stat{background:#f2f0f0;border-radius:14px;padding:15px}
+  .stat span{display:block;color:var(--muted);font-size:15px;margin-bottom:6px}
+  .stat strong{font-size:20px;font-weight:600}
+  .sliders{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:22px;margin-top:18px}
+  .sliderrow{display:grid;grid-template-columns:minmax(170px,1fr) minmax(120px,1.2fr) 70px;gap:14px;align-items:center;margin:8px 0 24px}
+  .sliderrow:last-child{margin-bottom:4px}
+  input[type=range]{width:100%;accent-color:#111}
+  output{font-family:ui-monospace,monospace;text-align:right}
+  .note{font-size:13px;line-height:1.5;color:#666;margin-top:20px}
+  @media(max-width:540px){main{padding:20px 12px}.viewer{height:460px;min-height:360px}.controls{left:10px;right:10px;top:10px;gap:5px}button{padding:10px 12px;font-size:13px}.status{font-size:12px}.card{padding:16px}.stats{gap:8px}.stat{padding:12px}.stat strong{font-size:17px}.sliderrow{grid-template-columns:1fr 1fr;gap:8px}.sliderrow label{grid-column:1/-1}.sliderrow output{grid-column:2;text-align:right}}
+</style>
+</head>
+<body>
+<main>
+  <h1>150 mm Concrete Test Cube Specimen</h1>
+  <p class="subtitle">3D cutaway visualization &amp; hydrophobic mix design analysis</p>
+
+  <section class="viewer" aria-label="Interactive 3D concrete specimen">
+    <div class="controls">
+      <button id="cutawayBtn" class="active">Cutaway: ON</button>
+      <button id="rotateBtn" class="active">Auto Rotate</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+    <canvas id="scene"></canvas>
+    <div class="status"><span class="dot"></span><span id="statusText">Inspecting: 150 mm Concrete Test Cube</span></div>
+  </section>
+
+  <nav class="filters" aria-label="Show concrete components">
+    <button class="filter active" data-filter="all">All Components</button>
+    <button class="filter" data-filter="cement"><span class="swatch" style="background:#7d858b"></span>Cement Matrix</button>
+    <button class="filter" data-filter="coarse"><span class="swatch" style="background:#394047"></span>Coarse Aggregate</button>
+    <button class="filter" data-filter="fine"><span class="swatch" style="background:#c6a873"></span>Fine Aggregate</button>
+    <button class="filter" data-filter="hydro"><span class="swatch" style="background:#2f80ff"></span>Hydrophobic Additive</button>
+  </nav>
+
+  <section class="card">
+    <div class="cardhead">
+      <h2>150 mm Concrete Test Cube (M40 Mix)</h2>
+      <div class="volume" id="volume">100% (3.375 Liters)</div>
+    </div>
+    <p class="desc">Standard 150 × 150 × 150 mm concrete cube specimen for 28-day compressive strength testing, illustrated with a conceptual hydrophobic pore-lining treatment.</p>
+    <div class="stats">
+      <div class="stat"><span>Target Strength</span><strong>40.0 MPa</strong></div>
+      <div class="stat"><span>Density (illustrative)</span><strong>2,380 kg/m³</strong></div>
+      <div class="stat"><span>Water/Binder</span><strong>0.40 Ratio</strong></div>
+      <div class="stat"><span>Contact Angle (target)</span><strong>108° (Hydrophobic)</strong></div>
+    </div>
+  </section>
+
+  <section class="sliders">
+    <div class="sliderrow">
+      <label for="offset">Layer Explosion / Offset</label>
+      <input id="offset" type="range" min="0" max="70" value="35">
+      <output id="offsetOut">35%</output>
+    </div>
+    <div class="sliderrow">
+      <label for="seal">Hydrophobic Seal Depth</label>
+      <input id="seal" type="range" min="1" max="15" value="5" step="0.5">
+      <output id="sealOut">5.0 mm</output>
+    </div>
+  </section>
+  <p class="note"><strong>Important:</strong> This is a conceptual visualization, not a validated mix design. Strength, density, water/binder ratio and contact angle are illustrative targets; confirm performance using laboratory testing and relevant standards before engineering use.</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+<script>
+(() => {
+  const canvas = document.getElementById('scene');
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color('#f2f0f0');
+  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  camera.position.set(5.8, 5.1, 7.3);
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x7d8ca1, 2.1));
+  const key = new THREE.DirectionalLight(0xffffff, 3.0);
+  key.position.set(4, 8, 6); key.castShadow = true; scene.add(key);
+  const fill = new THREE.DirectionalLight(0x9ccfff, 1.1); fill.position.set(-5,3,-4); scene.add(fill);
+
+  const model = new THREE.Group(); scene.add(model);
+  const cubeGroup = new THREE.Group(); model.add(cubeGroup);
+  const componentGroups = {cement:[], coarse:[], fine:[], hydro:[]};
+  const cubeSize = 2.7;
+  const concreteMat = new THREE.MeshStandardMaterial({color:0x5596d4, roughness:0.8, metalness:0.0});
+  const cutMat = new THREE.MeshStandardMaterial({color:0x67b3ed, roughness:0.8});
+  const darkMat = new THREE.MeshStandardMaterial({color:0x394047, roughness:0.94});
+  const fineMat = new THREE.MeshStandardMaterial({color:0xc6a873, roughness:0.8});
+  const hydroMat = new THREE.MeshStandardMaterial({color:0x2378ff, roughness:0.42, metalness:0.05});
+  const cementMat = new THREE.MeshStandardMaterial({color:0x7d858b, roughness:0.92});
+
+  // Six separated outer blocks make a readable cutaway around the exposed centre.
+  const blockSpecs = [
+    {p:[-0.78,0.76,0],s:[1.05,1.0,2.45]},
+    {p:[ 0.78,0.76,0],s:[1.05,1.0,2.45]},
+    {p:[0,-0.78,0.78],s:[1.05,1.0,0.88]},
+    {p:[0,-0.78,-0.78],s:[1.05,1.0,0.88]},
+    {p:[0,-0.78,0],s:[0.88,1.0,0.72]},
+    {p:[0,1.48,0],s:[1.12,0.16,2.7]}
+  ];
+  blockSpecs.forEach((b,i)=>{
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(...b.s), i===5?cutMat:concreteMat);
+    mesh.position.set(...b.p); mesh.castShadow=true; mesh.receiveShadow=true;
+    mesh.userData.base = mesh.position.clone(); mesh.userData.part='cement';
+    cubeGroup.add(mesh); componentGroups.cement.push(mesh);
+  });
+
+  // Exposed aggregate particles in the central cutaway.
+  let seed = 421;
+  function rand(){ seed=(seed*1664525+1013904223)>>>0; return seed/4294967296; }
+  for(let i=0;i<25;i++){
+    const radius=0.09+rand()*0.17;
+    const geo=new THREE.IcosahedronGeometry(radius,0);
+    const mesh=new THREE.Mesh(geo,darkMat);
+    mesh.position.set((rand()-.5)*1.22,(rand()-.5)*1.45,(rand()-.5)*1.15);
+    mesh.rotation.set(rand()*3,rand()*3,rand()*3);
+    mesh.castShadow=true; mesh.userData.base=mesh.position.clone(); mesh.userData.part='coarse';
+    cubeGroup.add(mesh); componentGroups.coarse.push(mesh);
+  }
+  for(let i=0;i<65;i++){
+    const r=0.025+rand()*0.027;
+    const mesh=new THREE.Mesh(new THREE.SphereGeometry(r,8,6),fineMat);
+    mesh.position.set((rand()-.5)*1.55,(rand()-.5)*1.75,(rand()-.5)*1.45);
+    mesh.userData.base=mesh.position.clone(); mesh.userData.part='fine';
+    cubeGroup.add(mesh); componentGroups.fine.push(mesh);
+  }
+  // Blue beads represent the conceptual hydrophobic additive/pore lining.
+  for(let i=0;i<24;i++){
+    const r=0.025+rand()*0.018;
+    const mesh=new THREE.Mesh(new THREE.SphereGeometry(r,8,6),hydroMat);
+    mesh.position.set((rand()-.5)*1.8,(rand()-.5)*1.9,(rand()-.5)*1.7);
+    mesh.userData.base=mesh.position.clone(); mesh.userData.part='hydro';
+    cubeGroup.add(mesh); componentGroups.hydro.push(mesh);
+  }
+
+  // A soft floor receives shadows.
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(200,200), new THREE.ShadowMaterial({opacity:0.17}));
+  floor.rotation.x=-Math.PI/2; floor.position.y=-1.62; floor.receiveShadow=true; scene.add(floor);
+
+  let cutaway=true, autoRotate=true, activeFilter='all', userRotating=false;
+  let pointerDown=false, lastX=0, lastY=0;
+  model.rotation.set(-0.08,0.48,0);
+  function applyFilter(){
+    Object.entries(componentGroups).forEach(([type,meshes])=>{
+      meshes.forEach(m=>{
+        const show=activeFilter==='all'||activeFilter===type;
+        m.visible=show;
+        if(type==='cement') m.material=cutaway?cutMat:concreteMat;
+      });
+    });
+    document.getElementById('statusText').textContent='Inspecting: '+({
+      all:'150 mm Concrete Test Cube',cement:'Cement Matrix',coarse:'Coarse Aggregate',
+      fine:'Fine Aggregate',hydro:'Hydrophobic Additive'
+    }[activeFilter]);
+  }
+  function updateExplosion(){
+    const amount=Number(document.getElementById('offset').value)/100;
+    componentGroups.cement.forEach((m,i)=>{
+      const b=m.userData.base;
+      const factor=(i===0?-1:i===1?1:i===2?1:i===3?-1:0);
+      m.position.set(b.x+factor*amount*.9,b.y+(i===5?amount*.25:0),b.z+(i===2?amount*.5:i===3?-amount*.5:0));
+    });
+    document.getElementById('offsetOut').textContent=Math.round(amount*100)+'%';
+    const depth=Number(document.getElementById('seal').value);
+    document.getElementById('sealOut').textContent=depth.toFixed(1)+' mm';
+    // Keep the display explicitly tied to specimen volume, not the offset slider.
+    document.getElementById('volume').textContent='100% (3.375 Liters)';
+  }
+  document.querySelectorAll('.filter').forEach(btn=>btn.addEventListener('click',()=>{
+    document.querySelectorAll('.filter').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active'); activeFilter=btn.dataset.filter; applyFilter();
+  }));
+  document.getElementById('cutawayBtn').addEventListener('click',()=>{
+    cutaway=!cutaway;
+    document.getElementById('cutawayBtn').textContent='Cutaway: '+(cutaway?'ON':'OFF');
+    document.getElementById('cutawayBtn').classList.toggle('active',cutaway);
+    // OFF closes the exposed view by bringing the blocks toward the cube centre.
+    applyFilter(); updateExplosion();
+    if(!cutaway){
+      componentGroups.cement.forEach(m=>{m.position.copy(m.userData.base);});
+    }
+  });
+  document.getElementById('rotateBtn').addEventListener('click',()=>{
+    autoRotate=!autoRotate;
+    document.getElementById('rotateBtn').classList.toggle('active',autoRotate);
+    document.getElementById('rotateBtn').textContent=autoRotate?'Auto Rotate':'Rotate: OFF';
+  });
+  document.getElementById('resetBtn').addEventListener('click',()=>{
+    model.rotation.set(-0.08,0.48,0);
+    camera.position.set(5.8,5.1,7.3);
+    cutaway=true;autoRotate=true;activeFilter='all';
+    document.getElementById('cutawayBtn').textContent='Cutaway: ON';
+    document.getElementById('cutawayBtn').classList.add('active');
+    document.getElementById('rotateBtn').textContent='Auto Rotate';
+    document.getElementById('rotateBtn').classList.add('active');
+    document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('active',b.dataset.filter==='all'));
+    document.getElementById('offset').value=35;document.getElementById('seal').value=5;
+    componentGroups.cement.forEach(m=>m.position.copy(m.userData.base));
+    applyFilter();updateExplosion();
+  });
+  document.getElementById('offset').addEventListener('input',updateExplosion);
+  document.getElementById('seal').addEventListener('input',updateExplosion);
+
+  canvas.addEventListener('pointerdown',e=>{pointerDown=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+  canvas.addEventListener('pointermove',e=>{
+    if(!pointerDown)return;
+    const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;
+    model.rotation.y+=dx*0.008;model.rotation.x+=dy*0.006;userRotating=true;
+  });
+  canvas.addEventListener('pointerup',()=>{pointerDown=false;});
+  canvas.addEventListener('pointercancel',()=>{pointerDown=false;});
+  canvas.addEventListener('wheel',e=>{
+    e.preventDefault();camera.position.multiplyScalar(e.deltaY>0?1.06:0.94);
+    camera.position.clampLength(4,16);
+  },{passive:false});
+
+  function resize(){
+    const w=canvas.clientWidth,h=canvas.clientHeight;
+    renderer.setSize(w,h,false);camera.aspect=w/h;camera.updateProjectionMatrix();
+  }
+  if('ResizeObserver' in window)new ResizeObserver(resize).observe(canvas.parentElement);
+  window.addEventListener('resize',resize);resize();
+  applyFilter();updateExplosion();
+  function animate(){
+    requestAnimationFrame(animate);
+    if(autoRotate&&!pointerDown)model.rotation.y+=0.0035;
+    renderer.render(scene,camera);
+  }
+  animate();
+})();
+</script>
+</body>
+</html>
