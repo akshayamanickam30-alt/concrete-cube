@@ -98,7 +98,15 @@
   const canvas = document.getElementById('scene');
   const scene = new THREE.Scene();
   scene.background = new THREE.Color('#f2f0f0');
-  const camera = new THREE.PerspectiveCamera(38, 1, 0.1, 100);
+  const camera = new THREE.PerspectiveCamera(
+    38,
+    1,
+    0.1,
+    100
+);
+
+camera.position.set(5.8, 5.1, 7.3);
+camera.lookAt(0, 0, 0);
   camera.position.set(5.8, 5.1, 7.3);
   const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
