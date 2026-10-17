@@ -105,9 +105,10 @@
     100
 );
 
-camera.position.set(5.8, 5.1, 7.3);
-camera.lookAt(0, 0, 0);
+
   camera.position.set(5.8, 5.1, 7.3);
+  camera.lookAt(0, 0, 0);
+  
   const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.shadowMap.enabled = true;
@@ -182,7 +183,11 @@ camera.lookAt(0, 0, 0);
 
   let cutaway=true, autoRotate=true, activeFilter='all', userRotating=false;
   let pointerDown=false, lastX=0, lastY=0;
-  model.rotation.set(-0.08,0.48,0);
+  
+  model.rotation.set(-0.08, 0.48, 0);
+  camera.position.set(5.8, 5.1, 7.3);
+  camera.lookAt(0, 0, 0);
+  
   function applyFilter(){
     Object.entries(componentGroups).forEach(([type,meshes])=>{
       meshes.forEach(m=>{
